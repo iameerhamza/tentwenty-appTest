@@ -22,8 +22,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   void initState() {
     _controller = YoutubePlayerController(
         initialVideoId: widget.movieTrailerData!.key!,
-        flags: const YoutubePlayerFlags(
-            autoPlay: true, controlsVisibleAtStart: true));
+        flags: const YoutubePlayerFlags(autoPlay: true, controlsVisibleAtStart: true));
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
@@ -34,14 +33,20 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   }
 
   @override
+  Future<void> dispose() async {
+    // TODO: implement dispose
+    super.dispose();
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: (){
-       backToDetailPage();
-        return Future.value(true);
-      },
-      child: videoPlayer(_controller!)
-    );
+        onWillPop: () {
+          backToDetailPage();
+          return Future.value(true);
+        },
+        child: videoPlayer(_controller!));
   }
 
   YoutubePlayerBuilder videoPlayer(YoutubePlayerController _controller, ) {
@@ -87,17 +92,11 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   }
 
 
-  backToDetailPage(){
+  backToDetailPage() async {
     WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-      SystemUiOverlay.top,
-      SystemUiOverlay.bottom
-    ]);
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     SystemChrome.restoreSystemUIOverlays();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown
-    ]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     Wakelock.disable();
     Navigator.pop(context);
